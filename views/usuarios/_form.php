@@ -1,0 +1,191 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use kartik\date\DatePicker;
+use yii\helpers\Url;
+
+/* @var $this yii\web\View */
+/* @var $model app\models\Usuarios */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+<?php /* $form = ActiveForm::begin([
+		'id' => 'form-usuarios-create',
+		'method' => 'post',
+]);  */ ?>
+
+<?php 
+$form = ActiveForm::begin([
+		'options' => ['enctype' => 'multipart/form-data'], 
+		'method' => 'post', 
+		'id' => 'form-usuarios-create'
+]);
+?>
+
+<div class="row">
+	<div class="col-md-12 col-sm-12">
+		<p class="note"><?php // print Yii::t('general','fields_required'); ?></p>
+		<?= $form->errorSummary($model); ?>
+		<div>&nbsp;</div>
+	</div>
+</div>	
+<div class="row">
+			<div class="col-md-3 col-sm-6"> 
+				<?= $form->field($model, 'usuario_nombre')->textInput(['maxlength' => true,'class' => 'form-control']) ?>
+			</div>
+			<div class="col-md-3 col-sm-6">
+				<?= $form->field($model, 'usuario_apellido')->textInput(['maxlength' => true]) ?>
+			</div>
+			<div class="col-md-2">
+				<?php 
+					echo $form->field($model, 'usuario_perfil')->dropDownList(
+					Yii::$app->params['usuariosPerfiles'], 
+					['prompt'=>'Seleccione...']);
+				?>
+			</div>
+</div>
+	<div class="row">
+		<div class="col-md-4">
+			<?= $form->field($model, 'usuario_email')->textInput() ?>
+		</div>
+		  
+		<div class="col-md-4">
+			<?= $form->field($model, 'usuario_email_confirmacion')->textInput() ?>
+		</div>
+	</div>
+	
+	<div class="row">	
+		<?php 
+		if(!$model->isNewRecord){
+			$model->usuario_password = "";
+		} 
+		?>
+		<div class="col-md-4">
+			<?= $form->field($model, 'usuario_password')->passwordInput() ?>
+		</div>
+		<div class="col-md-4">
+			<?= $form->field($model, 'usuario_password_confirmacion')->passwordInput() ?>
+		</div>
+	</div>	
+			
+<div class="row">				
+			
+			<!--  
+			<div class="col-md-12">
+			<?php 
+				/*
+				// usage without $model
+				print Html::activeLabel($model, 'usuario_fecha_nacimiento');
+				echo DatePicker::widget([
+						'name' => 'Usuarios[usuario_fecha_nacimiento]',
+						'value' => (isset($_REQUEST['Usuarios'])) ? $_REQUEST['Usuarios']['usuario_fecha_nacimiento'] : '',
+						'options' => ['placeholder' => 'Seleccione...'],
+						'pluginOptions' => [
+								'format' => 'dd-mm-yyyy',
+								'todayHighlight' => true,
+								'autoclose' => true
+						]
+				]);
+				print Html::error($model, 'usuario_fecha_nacimiento');
+				*/
+				?>
+			</div>
+			-->
+			
+		<div class="col-md-8 text-center">
+		
+		<h3>Escoje un avartar</h3>
+		<?php //var_dump($model->usuario_imagen_1); ?>
+    
+    	<?php //echo Html::hiddenInput('usuario_imagen_1', $model->usuario_imagen_1); 
+			
+			echo $form->field($model, 'usuario_imagen_1')
+			->hiddenInput()
+			->label(false);
+			
+			
+			?>
+				<style>
+			    	.selectAvatar {
+			    		cursor: pointer;
+			    	}
+			    	.selectAvatar:HOVER{
+			    		opacity: 0.5;
+			    	}
+			    </style>
+			    <div>&nbsp;</div>
+				<div id="avatarSeleccionado" class="text-center">
+					<?php 
+					
+						/*
+						 * en este caso la logica de los avatars es que hay un hidden de la imagen 1
+						 * de los usuarios que se actualiza con el js bmosoluciones.js
+						 * y eso cambia la imagen del hidden
+						 */
+					
+						$homeUrl = Url::base(true).'/web/resources/AdminLTE/dist/img/avatars/';
+						/*if(substr_count(Yii::app()->user->getState("imagen_1"), 'avatar') > 0){
+			    			$fotoAvatar = Yii::app()->theme->baseUrl.'/resources/images/avatares/'.Yii::app()->user->getState("imagen_1");
+			    	?>
+			    			<img src='<?php print $fotoAvatar; ?>' height='200' width='200' >
+			    	<?php 		
+			 			}*/
+					?>
+					<?php 
+						if(!empty($model->usuario_imagen_1)){
+							$fotoAvatar = $homeUrl.$model->usuario_imagen_1;
+					?>
+						<img src='<?php print $fotoAvatar; ?>' height='200' width='200' >
+					<?php 		
+			 			}
+					?>
+					
+				</div>
+				<div>&nbsp;</div>
+				
+				 <?php 
+    
+				 	
+				    $folder = Yii::$app->basePath.'/web/resources/AdminLTE/dist/img/avatars';
+				    if(is_dir($folder)){
+				    	$folderContent = scandir($folder);
+				    	
+				    	foreach($folderContent as $keyFolCon => $valFolCon){
+				    		// si esta la palabra avatar en el archivo
+				    		if(substr_count($valFolCon, 'avatar') > 0){
+				    ?>
+				    
+				    	<img class="selectAvatar" alt="avatar" title="avatar" avatarName="<?php print $valFolCon; ?>" src="<?php print $homeUrl.$valFolCon; ?>" style="max-height: 85px; max-width: 85px;">
+				    
+				    <?php 
+				    		}
+				    		
+				    	}
+				    	
+				    	
+				    }
+				    
+				    ?>
+				
+				
+		</div>
+			
+			<div class="col-md-8 text-center">
+			<div>&nbsp;</div>
+			 <?= Html::a(
+			 		$model->isNewRecord ? 'Crear' : 'Actualizar', 
+			 		$model->isNewRecord ? ['usuarios/create'] : ['usuarios/update','id'=>$model->usuario_id], 
+			 		[
+		        	'data' => [
+			            'method' => 'post',
+			        	],
+		 				'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary'
+		    		])?>
+    <div>&nbsp;</div>
+			</div>
+		
+		
+	
+</div>
+<?php ActiveForm::end(); ?>
